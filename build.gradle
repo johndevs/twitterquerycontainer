@@ -1,0 +1,18 @@
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'jetty'
+
+task wrapper(type:Wrapper){ gradleVersion='1.0' }
+
+sourceCompatibility=1.6
+targetCompatibility=1.6
+
+repositories{
+        mavenCentral()
+}
+
+dependencies{
+	compile group:'com.vaadin', 		name:'vaadin', 	version:'6.8.1'
+	compile group:'com.google.code.gson', 	name:'gson', 	version:'2.2.2'
+}
+
