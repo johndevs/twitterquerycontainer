@@ -1,0 +1,28 @@
+dependencies{
+	compile group:'com.google.code.gson', 	name:'gson', 	version:'2.2.2'
+}
+
+jar{
+         // JAR filename
+        baseName = 'twitterquerycontainer'
+
+        // Do not build if tests do not pass
+        dependsOn test
+
+        // Include sources
+        sourceSets.main.java.srcDirs.each{
+                from it
+        }
+
+        // Create manifest
+        manifest{
+                attributes(
+                        'Vaadin-Package-Version': 1,
+                        'Vaadin-License-Title': 'Apache 2.0',
+                        'Implementation-Title': 'TwitterQueryContainer',
+                        'Implementation-Version': version,
+                        'Implementation-Vendor': 'John Ahlroos'
+                )
+        }
+}
+

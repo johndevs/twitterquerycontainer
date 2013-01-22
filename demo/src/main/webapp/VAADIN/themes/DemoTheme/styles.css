@@ -1,13 +1,12 @@
 @import url(../reindeer/styles.css);
 
 .v-select-optiongroup-horizontal .v-radiobutton {
-  display:block;
-  float:left;
+	display:block;
+	float:left;
 }
 
 .v-formlayout-row{
 	float:left;	
-	
 }
 
 .v-formlayout-errorcell{
@@ -18,5 +17,7 @@
 .v-formlayout-captioncell,
 .v-formlayout-contentcell{
 	padding-top:15px !important;
-	
 }
+
+
+
