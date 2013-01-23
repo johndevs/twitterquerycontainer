@@ -4,7 +4,7 @@ dependencies {
 
 war {
         // WAR filename
-        archiveName = 'TwitterQueryContainer.war'
+        archiveName = 'TwitterQueryContainer7.war'
 
         dependsOn test
 
