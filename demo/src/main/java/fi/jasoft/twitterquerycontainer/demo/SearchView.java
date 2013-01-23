@@ -9,11 +9,12 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.terminal.ExternalResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -24,6 +25,8 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.Table.ColumnHeaderMode;
+import com.vaadin.ui.Window.CloseEvent;
 import com.vaadin.ui.themes.Reindeer;
 
 import fi.jasoft.twitterquerycontainer.IdenticaQueryContainer;
@@ -31,28 +34,26 @@ import fi.jasoft.twitterquerycontainer.ResultType;
 import fi.jasoft.twitterquerycontainer.SocialContainer;
 import fi.jasoft.twitterquerycontainer.TwitterQueryContainer;
 
-public class SearchWindow extends Window {
+public class SearchView extends CustomComponent {
 
     private TwitterQueryContainer twitterContainer = new TwitterQueryContainer();
 
     private IdenticaQueryContainer identicaContainer = new IdenticaQueryContainer();
 
-    private SimpleDateFormat timestampFormat = new SimpleDateFormat(
-            "EEE, d MMM yyyy HH:mm:ss Z"); // Fri, 30 Dec 2011 06:39:57 +0000)
-
-    private SimpleDateFormat timestampDisplayFormat = new SimpleDateFormat(
-            "d MMM yyyy H:mm"); // 30 Dec 2011 6:39
-
     private Table table;
 
-    public SearchWindow() {
+    public SearchView() {
         setCaption("Twitter Search");
-        ((VerticalLayout) getContent()).setSizeFull();
-        ((VerticalLayout) getContent()).setSpacing(true);
+        setSizeFull();
+        
+        VerticalLayout vl = new VerticalLayout();
+        vl.setSizeFull();
+        vl.setSpacing(true);
+        setCompositionRoot(vl);
 
         Label header = new Label("Twitter Search");
         header.setStyleName(Reindeer.LABEL_H1);
-        addComponent(header);
+        vl.addComponent(header);
 
         Label description = new Label(
                 "This application lets you search using the Twitter Search Rest API. "
@@ -60,13 +61,13 @@ public class SearchWindow extends Window {
                         + "or with more advanced criterias. Twitter provides search results for "
                         + "the last 6 days or so.");
         description.setStyleName(Reindeer.LABEL_SMALL);
-        addComponent(description);
+        vl.addComponent(description);
 
         OptionGroup service = new OptionGroup("Service: ", Arrays.asList(
                 "Twitter", "Identi.ca"));
         service.setImmediate(true);
         service.setValue("Twitter");
-        service.addListener(new Property.ValueChangeListener() {
+        service.addValueChangeListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
                 if (event.getProperty().getValue().equals("Twitter")) {
                     setTableContainer(twitterContainer);
@@ -76,19 +77,18 @@ public class SearchWindow extends Window {
             }
         });
 
-        // FIXME Hidden until Identica resolves their issues
-        // addComponent(service);
+        //vl.addComponent(service);
 
         HorizontalLayout hl = new HorizontalLayout();
         hl.setWidth("100%");
         hl.setSpacing(true);
-        addComponent(hl);
+        vl.addComponent(hl);
 
         final TextField search = new TextField();
         search.setWidth("100%");
         search.setInputPrompt("Enter search query ('vaadin' for instance)...");
         search.setImmediate(true);
-        search.addListener(new FieldEvents.TextChangeListener() {
+        search.addTextChangeListener(new FieldEvents.TextChangeListener() {
             public void textChange(TextChangeEvent event) {
                 SocialContainer sc = (SocialContainer) table
                         .getContainerDataSource();
@@ -96,7 +96,7 @@ public class SearchWindow extends Window {
                 sc.refresh();
             }
         });
-        search.addListener(new Property.ValueChangeListener() {
+        search.addValueChangeListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
                 SocialContainer sc = (SocialContainer) table
                         .getContainerDataSource();
@@ -110,34 +110,34 @@ public class SearchWindow extends Window {
                 new Button.ClickListener() {
                     public void buttonClick(ClickEvent event) {
                         AdvancedSearchWindow win = new AdvancedSearchWindow();
-                        win.addListener(new Window.CloseListener() {
+                        win.addCloseListener(new Window.CloseListener() {
                             public void windowClose(CloseEvent e) {
                                 search.setValue(((AdvancedSearchWindow) e
                                         .getWindow()).getQuery());
                             }
                         });
-                        addWindow(win);
+                        getUI().addWindow(win);
 
                     }
                 });
         hl.addComponent(advanced);
         hl.setExpandRatio(search, 1);
 
-        table = new Table(null, twitterContainer);
+        table = new Table();
         table.setSizeFull();
 
         addGeneratedColumnsToTable();
         setTableContainer(twitterContainer);
 
-        addComponent(table);
-        ((VerticalLayout) getContent()).setExpandRatio(table, 1);
+        vl.addComponent(table);
+        vl.setExpandRatio(table, 1);
 
         FormLayout options = new FormLayout();
         options.setCaption("Options");
         options.setMargin(true);
         Panel optionPanel = new Panel(options);
         optionPanel.setWidth("100%");
-        addComponent(optionPanel);
+        vl.addComponent(optionPanel);
 
         OptionGroup maxResults = new OptionGroup("Max results", Arrays.asList(
                 5, 10, 50, 100));
@@ -145,7 +145,7 @@ public class SearchWindow extends Window {
         maxResults.setStyleName("horizontal");
         SocialContainer sc = (SocialContainer) table.getContainerDataSource();
         maxResults.setValue(sc.getMaxResults());
-        maxResults.addListener(new Property.ValueChangeListener() {
+        maxResults.addValueChangeListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
                 SocialContainer sc = (SocialContainer) table
                         .getContainerDataSource();
@@ -161,7 +161,7 @@ public class SearchWindow extends Window {
         type.setStyleName("horizontal");
         type.setValue("Both");
         type.setImmediate(true);
-        type.addListener(new Property.ValueChangeListener() {
+        type.addValueChangeListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString();
                 SocialContainer sc = (SocialContainer) table
@@ -180,7 +180,7 @@ public class SearchWindow extends Window {
 
         final CheckBox metadata = new CheckBox("Include metadata");
         metadata.setImmediate(true);
-        metadata.addListener(new Property.ValueChangeListener() {
+        metadata.addValueChangeListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
                 SocialContainer sc = (SocialContainer) table
                         .getContainerDataSource();
@@ -209,7 +209,7 @@ public class SearchWindow extends Window {
                         }
                         if (url != null) {
                             Embedded image = new Embedded(null,
-                                    new ExternalResource(url.toString()));
+                                    new com.vaadin.server.ExternalResource(url.toString()));
                             image.setWidth("48px");
                             image.setHeight("48px");
                             return image;
@@ -307,8 +307,8 @@ public class SearchWindow extends Window {
                             value = text.replaceAll(regex,
                                     "<a target=\"_blank\" href=\"$1\">$1</a>");
 
-                            Label lbl = new Label(value.toString(),
-                                    Label.CONTENT_RAW);
+                            Label lbl = new Label(value.toString(), ContentMode.HTML);
+                       
                             lbl.setSizeFull();
                             CssLayout layout = new CssLayout();
                             layout.setSizeFull();
@@ -330,7 +330,7 @@ public class SearchWindow extends Window {
                 SocialContainer.PROFILE_IMAGE_PROPERTY,
                 "usernameAndNameColumn", SocialContainer.TEXT_PROPERTY, });
 
-        table.setColumnHeaderMode(Table.COLUMN_HEADER_MODE_HIDDEN);
+        table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
         table.setColumnWidth(SocialContainer.PROFILE_IMAGE_PROPERTY, 50);
         table.setColumnWidth(SocialContainer.TEXT_PROPERTY, 300);
         table.setColumnExpandRatio(SocialContainer.TEXT_PROPERTY, 1);

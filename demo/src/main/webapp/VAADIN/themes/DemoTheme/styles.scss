@@ -1,0 +1,25 @@
+@import "../reindeer/reindeer.scss";
+
+.DemoTheme {
+	@include reindeer;
+	
+	.v-select-optiongroup-horizontal .v-radiobutton {
+		display:block;
+		float:left;
+	}
+	
+	.v-formlayout-row{
+		float:left;	
+	}
+	
+	.v-formlayout-errorcell{
+		clear:both;
+		display:none;
+	}
+	
+	.v-formlayout-captioncell,
+	.v-formlayout-contentcell{
+		padding-top:15px !important;
+	}
+}
+

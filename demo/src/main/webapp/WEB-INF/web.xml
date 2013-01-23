@@ -8,11 +8,11 @@
 	</context-param>
 	<servlet>
 		<servlet-name>Demo</servlet-name>
-		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
 		<init-param>
 			<description>The application</description>
-			<param-name>application</param-name>
-			<param-value>fi.jasoft.twitterquerycontainer.demo.TwitterquerycontainerApplication</param-value>
+			<param-name>ui</param-name>
+			<param-value>fi.jasoft.twitterquerycontainer.demo.TwitterquerycontainerUI</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
